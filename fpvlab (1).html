@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FPV Lab — 1S micro drone comparator & builder</title>
+<style>
+:root{color-scheme:dark;--bg:#0f131a;--p:#171d27;--p2:#1d2531;--ln:#2a3342;--tx:#e9eef6;--mu:#93a1b5;--ac:#5cc8ff;--ac2:#0e3a52;--ok:#7be0a4;--wn:#ffb454}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.nav{position:sticky;top:0;z-index:20;background:#0f131aee;backdrop-filter:blur(8px);border-bottom:1px solid var(--ln)}
+.nav>div,main,footer{max-width:1180px;margin:auto;padding-inline:20px}.nav>div{display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto}
+.logo{font-weight:800;font-size:18px;letter-spacing:-.5px;margin-right:auto;white-space:nowrap}.logo b{color:var(--ac)}
+.nav button{background:none;border:0;border-radius:8px;padding:8px 14px;color:var(--mu);font-weight:600;white-space:nowrap}.nav button.on{background:var(--ac2);color:var(--ac)}
+.hero{padding:44px 0 28px}h1{font-size:clamp(34px,6vw,60px);line-height:1.02;letter-spacing:-2px;margin:0 0 14px;max-width:760px}
+.hero p{color:var(--mu);max-width:600px;font-size:17px;margin:0 0 20px}.cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--ln);background:var(--p2);border-radius:9px;padding:9px 14px;font-weight:600}.btn:hover{border-color:var(--ac)}.btn.pr{background:var(--ac);border-color:var(--ac);color:#04202f}.btn:disabled{opacity:.4;cursor:not-allowed}
+.sec{display:none;gap:20px;padding-bottom:40px}.sec.on{display:grid}h2{font-size:20px;margin:0;letter-spacing:-.3px}.sub{color:var(--mu);font-size:13px}
+.pn{background:var(--p);border:1px solid var(--ln);border-radius:12px;padding:18px}.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+select,input[type=search]{width:100%;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:9px 10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{border:1px solid var(--ln);background:none;border-radius:20px;padding:5px 12px;font-size:13px;color:var(--mu)}.chip.on{background:var(--ac2);border-color:var(--ac);color:var(--ac)}
+.tag{display:inline-block;font-size:12px;border-radius:5px;padding:2px 8px;background:#173a2a;color:var(--ok)}.tag.e{background:#3a2d14;color:var(--wn)}
+.tl{border-bottom:1px dotted var(--mu);cursor:help}.tl i{display:inline-grid;place-items:center;width:15px;height:15px;margin-left:5px;border:1px solid var(--mu);border-radius:50%;font:700 10px/1 system-ui;color:var(--mu)}.tl:hover,.tl:focus{color:var(--ac);border-color:var(--ac)}.tl:hover i,.tl:focus i{border-color:var(--ac);color:var(--ac)}
+#tip{position:fixed;z-index:50;display:none;max-width:290px;background:#05080c;border:1px solid var(--ac);border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.45;box-shadow:0 8px 28px #000a;pointer-events:none}
+.win{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.win div{background:var(--p2);border-radius:10px;padding:12px}.win b{display:block;font-size:17px;margin:2px 0}
+.card{background:var(--p2);border:1px solid var(--ln);border-radius:11px;overflow:hidden}.card .t{padding:14px;border-bottom:1px solid var(--ln)}.card h3{margin:2px 0;font-size:18px}.card .b{padding:6px 14px 12px}
+.r{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln)}.r:last-child{border:0}.r span:first-child{color:var(--mu)}
+.bar{height:5px;background:var(--ln);border-radius:5px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--ac)}
+.sc{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--ln);font-size:13px}th{color:var(--mu);font-weight:600}.best{color:var(--ok);font-weight:700}
+.cat{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--ln)}
+.bf{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.bf label{display:block;font-weight:600;margin-bottom:6px}.bf small{display:block;color:var(--mu);font-size:12px;margin-top:5px}
+.res{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.res div{background:var(--p2);border-radius:10px;padding:12px}.res strong{display:block;font-size:26px;letter-spacing:-.8px}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 8px}.lg{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:12px;color:var(--mu)}.lg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.warn{background:#2a2113;border:1px solid #5a4520;color:var(--wn);border-radius:9px;padding:11px 13px;font-size:13px}.ok{background:#12261d;border-color:#245a3d;color:var(--ok)}
+.gl{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.gl h3{margin:0 0 4px;font-size:16px;color:var(--ac)}.gl p{margin:0;color:var(--mu);font-size:14px}
+a{color:var(--ac);overflow-wrap:anywhere}footer{padding-block:20px;color:var(--mu);font-size:12px;border-top:1px solid var(--ln)}
+</style></head><body>
+<div id="tip" role="tooltip"></div>
+<nav class="nav"><div><span class="logo">FPV<b>Lab</b></span><button data-go="compare">Compare</button><button data-go="build">Build</button><button data-go="guide">Guide</button></div></nav>
+<main>
+<header class="hero"><h1>Find the right 1S micro drone — or build your own.</h1><p>Compare tinywhoops and micro FPV drones on a common battery, then design a build part by part and see weight, thrust, speed and flight time update live.</p><div class="cta"><button class="btn pr" data-go="compare">Compare drones</button><button class="btn" data-go="build">Build a drone</button><button class="btn" data-go="guide">Learn the terms</button></div></header>
+
+<section class="sec" id="compare">
+<div class="pn"><div class="hd"><div><h2>Your lineup</h2><div class="sub">Pick up to 5 models to compare side by side.</div></div><button class="btn pr" id="add">+ Add drone</button></div><div class="grid" id="slots"></div></div>
+<div class="pn"><div class="hd"><div><h2><span class="tl" tabindex="0" data-tip="Rescales flight time and flying weight as if every drone ran the same battery capacity, so the comparison is fair. Scaling is linear, which is only an approximation.">Reference battery<i>i</i></span></h2><div class="sub" id="batText"></div></div><span class="tag">1S · 3.7 V nominal</span></div><div class="chips" id="bats"></div></div>
+<div id="winners" class="win"></div>
+<div class="pn"><div class="hd"><div><h2>Drone profiles</h2><div class="sub">Switch the view to focus on one aspect.</div></div><div class="chips" id="views"></div></div><div class="grid" id="cards"></div></div>
+<div class="pn"><div class="hd"><div><h2><span class="tl" tabindex="0" data-tip="Each metric is shown as a percentage of the best value in your current selection. It is a relative index, not an absolute quality score.">Head to head<i>i</i></span></h2><div class="sub">100% = best in your selection. For weight, lower is better.</div></div></div><div class="sc"><table id="tbl"></table></div></div>
+<div class="pn"><div class="hd"><div><h2>Catalog</h2><div class="sub" id="cc"></div></div></div><input type="search" id="q" placeholder="Search by model, brand or category…" aria-label="Search catalog"><div class="chips" id="cats" style="margin:12px 0 4px"></div><div id="catalog"></div></div>
+<div class="warn">Top speed and spare payload are class-level estimates. Manufacturers do not publish them under a common protocol, so only same-battery, same-prop bench or flight tests can settle them.</div>
+</section>
+
+<section class="sec" id="build">
+<div class="pn"><div class="hd"><div><h2>Build configurator</h2><div class="sub">Choose each part. Results are simplified estimates from generic part profiles.</div></div><div class="chips" id="presets"></div></div><div class="bf" id="bf"></div></div>
+<div class="pn"><div class="hd"><h2>Estimated result</h2><span class="tag" id="verdict"></span></div><div class="res" id="res"></div><div class="stack" id="stack"></div><div class="lg" id="lg"></div></div>
+<div class="warn" id="bw"></div>
+<div class="cta"><button class="btn" id="reset">Reset build</button><button class="btn pr" id="copy">Copy build summary</button><span class="sub" id="cs" style="align-self:center"></span></div>
+</section>
+
+<section class="sec" id="guide">
+<div class="pn"><div class="hd"><div><h2>Glossary</h2><div class="sub">The terms behind every number on this site.</div></div></div><div class="gl" id="gl"></div></div>
+<div class="pn"><h2>Method</h2><p class="sub">Top speed ≈ 28 × √(KV/22000) × √(25 g / dry weight), clamped to 18–75 km/h. Thrust per motor comes from the motor class (about 17–43 gf on typical micros), multiplied by four and reduced 28% for losses. Spare payload = max(0, effective thrust / 2 − flying weight), which keeps a 2:1 thrust-to-weight reserve. Flight time rescaled by battery capacity assumes linear scaling. None of this replaces testing.</p></div>
+<div class="pn sub" style="line-height:1.9"><h2 style="color:var(--tx)">Sources</h2>
+<a href="https://www.happymodel.cn/index.php/2024/02/24/mobula6-2024-1s-65mm-ultra-light-micro-fpv-whoop-bnf/" target="_blank" rel="noopener">Happymodel Mobula6 2024</a> · <a href="https://betafpv.com/products/meteor65-pro-brushless-whoop-quadcopter-1s" target="_blank" rel="noopener">BETAFPV Meteor65 Pro</a> · <a href="https://betafpv.com/products/meteor65-pro-o4-brushless-whoop-quadcopter" target="_blank" rel="noopener">Meteor65 Pro O4</a> · <a href="https://betafpv.com/products/air75-brushless-whoop-quadcopter" target="_blank" rel="noopener">Air75</a> · <a href="https://betafpv.com/collections/bfcm2026/products/air75-ii-brushless-whoop-quadcopter" target="_blank" rel="noopener">Air75 II</a> · <a href="https://betafpv.com/products/meteor75-pro-brushless-whoop-quadcopter-1s-hd-digital-vtx" target="_blank" rel="noopener">Meteor75 Pro HD</a> · <a href="https://betafpvtech.com/products/meteor75-pro-o4-brushless-whoop-quadcopter" target="_blank" rel="noopener">Meteor75 Pro O4</a> · <a href="https://www.fpv-db.com/quads/happymodel-mobula7-1s/" target="_blank" rel="noopener">FPV-DB Mobula7</a> · <a href="https://fpvgarage.eu/betafpv-meteor75-pro-brushless-whoop-quadcopter-elrs-7235" target="_blank" rel="noopener">FPV Garage Meteor75 Pro</a><br>Models marked “Estimated profile” have no unambiguous spec sheet. Always confirm the exact version before buying.</div>
+</section>
+</main>
+<footer>FPV Lab · Independent interactive prototype · Verify exact versions and manufacturer specs before buying.</footer>
+<script>
+(()=>{'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],fm=n=>n==null||!isFinite(n)?'—':String(Math.round(n*10)/10);
+const T=(l,t)=>`<span class="tl" tabindex="0" data-tip="${t.replace(/"/g,'&quot;')}">${l}<i>i</i></span>`;
+// Tooltips: custom, hover + keyboard focus + tap
+const tip=$('#tip');let cur=null;
+function show(el){cur=el;tip.textContent=el.dataset.tip;tip.style.display='block';const r=el.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2))+'px';tip.style.top=(r.top-h-10<8?r.bottom+10:r.top-h-10)+'px'}
+const hide=()=>{tip.style.display='none';cur=null};
+document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');t?show(t):hide()});
+document.addEventListener('focusin',e=>{const t=e.target.closest('[data-tip]');t?show(t):hide()});
+document.addEventListener('click',e=>{const t=e.target.closest('[data-tip]');if(t&&cur!==t)show(t);else if(!t)hide()});
+addEventListener('scroll',hide,{passive:true});document.addEventListener('keydown',e=>e.key==='Escape'&&hide());
+// Navigation
+function go(p){if(!['compare','build','guide'].includes(p))p='compare';$$('.sec').forEach(s=>s.classList.toggle('on',s.id===p));$$('[data-go].on,.nav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===p&&b.closest('.nav')));hide();history.replaceState(null,'','#'+p)}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);scrollTo(0,g.closest('.nav')?0:$('.nav').offsetTop+300)}});
+// Data
+const CATS={w65:'65 mm indoor',w75:'75 mm all-round',w85:'85 mm outdoor',hd:'Digital HD',in2:'2" open prop / cine'};
+const db=[
+['mo6','Mobula6 2024 V3','Happymodel','w65',17.6,300,2.3,28000,'0702',31,'Crazybee G473','Analog · 25–400 mW','ELRS 2.4 GHz',,'Very light, indoor-focused','M'],
+['me65','Meteor65 Pro','BETAFPV','w65',23.01,300,4.5,19500,'0802SE',35,'F4 1S · 5 A','Analog · 25–350 mW','ELRS 2.4 GHz',,'35 mm props','M'],
+['mo7','Mobula7 1S','Happymodel','w75',24,450,6,20000,'SE0802',40,'AIO (version dependent)','Analog / HDZero','SPI ELRS',,'Analog version',''],
+['me75','Meteor75 Pro','BETAFPV','w75',30.5,550,6.5,22000,'1102',45,'Matrix 1S','Analog · up to 400 mW','Serial ELRS','','45 mm props, published flight time','M'],
+['me65o4','Meteor65 Pro O4','BETAFPV','hd',28.53,300,2.67,19500,'0802SE',35,'Matrix 1S 3IN1 HD','DJI O4 Air Unit','Serial ELRS',,'Digital HD video','M'],
+['beta65','Beta65 Pro 1S','BETAFPV','w65',23.29,300,4,17500,'0802',31,'F4 1S AIO · 5 A','Analog','Version dependent',,'Original version',''],
+['air75','Air75','BETAFPV','w75',21,450,6.5,23000,'0802SE',40,'Air 4-in-1','Analog · up to 400 mW','Serial ELRS',,'Ultralight build','M'],
+['a2f','Air75 II Freestyle','BETAFPV','w75',21.3,480,7.5,22000,'0802',40,'Matrix 1S 5IN1 II · 12 A','Analog · 25–400 mW','Serial ELRS',25,'Official: 21.3 g, up to 7:30 on 480 mAh','M'],
+['a2r','Air75 II Racing','BETAFPV','w75',20.9,480,7,25000,'0802',40,'Matrix 1S 5IN1 II · 12 A','Analog · 25–400 mW','Serial ELRS',28,'Official: 20.9 g, up to 7:00 on 480 mAh','M'],
+['a2c','Air75 II Champion','BETAFPV','w75',20.2,480,6.83,28000,'0802 dual bearing',40,'Matrix 1S 5IN1 II · 12 A','Analog · 25–400 mW','Serial ELRS',32,'Official: 20.2 g, 6:50, 7.1:1 claimed thrust/weight','M'],
+['me75p1','Meteor75 Pro P1','BETAFPV','hd',37.5,580,5.5,21000,'1102',45,'Matrix 1S 3IN1 HD','Digital P1','ELRS',,'Digital variant, secondary source',''],
+['air65','Air65','BETAFPV','w65',17,300,4,27000,'0702',31,'Air 5-in-1 AIO','Integrated analog','Serial ELRS',,'Class-level weight and flight time',''],
+['mob8','Mobula8 1S','Happymodel','w85',26,550,5,19000,'1103',45,'X12 AIO','Analog','ELRS',,'Category estimate',''],
+['mob7hd','Mobula7 HDZero','Happymodel','hd',29.5,450,4,19000,'0802',40,'HDZero-compatible AIO','HDZero Whoop Lite','ELRS',,'Configuration estimate',''],
+['pavo20','Pavo20','BETAFPV','in2',85,750,5,16000,'1104',51,'F405 AIO','Digital / analog','ELRS',,'Class profile, not directly comparable to 1S',''],
+['bass','Bassline 2S','Happymodel','in2',55,450,4.5,20000,'1103',51,'2S AIO','Analog','ELRS',,'Rough estimate, check version',''],
+['mob6e','Mobula6 Eco','Happymodel','w65',18.5,300,3.5,19000,'0702',31,'Integrated AIO','Analog','ELRS',,'Estimated profile',''],
+['gen75','Generic 75 mm build','FPV Lab estimate','w75',25,450,5,22000,'0802',40,'AIO 1S 5 A','Analog','ELRS',,'Calculated reference, not a product','']
+].map(a=>({id:a[0],name:a[1],brand:a[2],cat:a[3],weight:a[4],batt:a[5],flight:a[6],kv:a[7],motor:a[8],prop:a[9],fc:a[10],vtx:a[11],rx:a[12],tm:a[13]||null,notes:a[14],m:a[15]==='M'}));
+let sel=['mo6','mo7','me75'],bat=450,view='summary',cat='all';
+const get=id=>db.find(d=>d.id===id),bw=m=>m*.0255+.5,tmot=d=>d.tm||({'0702':17,'0802':24,'0802SE':23,SE0802:23,'1102':43,'1103':42,'1104':55}[d.motor]||24);
+const calc={time:d=>d.flight*bat/d.batt,fly:d=>d.weight+bw(bat),thr:d=>tmot(d)*4*.72,
+ speed:d=>Math.round(Math.max(18,Math.min(75,28*Math.sqrt(d.kv/22000)*Math.sqrt(25/d.weight)))),
+ pay:d=>Math.max(0,calc.thr(d)/2-(d.weight+bw(d.batt))),tw:d=>calc.thr(d)/calc.fly(d)};
+const tag=d=>d.m?'<span class="tag">Manufacturer data</span>':'<span class="tag e">Estimated profile</span>';
+// Compare
+function render(){
+ $('#slots').innerHTML=sel.map((id,i)=>`<div class="pn" style="padding:12px;background:var(--p2)"><div class="hd" style="margin-bottom:8px"><span class="sub">Slot ${i+1}</span>${sel.length>1?`<button class="btn" style="padding:2px 9px" data-rm="${id}" aria-label="Remove ${get(id).name}">×</button>`:''}</div><select data-sw="${id}" aria-label="Model ${i+1}">${db.map(d=>`<option value="${d.id}" ${d.id===id?'selected':''}>${d.name}</option>`).join('')}</select><div class="sub" style="margin-top:6px">${get(id).brand} · ${CATS[get(id).cat]}</div></div>`).join('');
+ $('#add').disabled=sel.length>=5;$('#add').textContent=sel.length>=5?'Maximum 5 drones':'+ Add drone';
+ $('#bats').innerHTML=[300,450,550,650,850,1000].map(b=>`<button class="chip ${b===bat?'on':''}" data-bat="${b}">${b} mAh</button>`).join('');
+ $('#batText').textContent=`${bat} mAh · ${(bat*3.7/1000).toFixed(2)} Wh nominal. Real weight and internal resistance depend on the actual pack.`;
+ $('#views').innerHTML=[['summary','Overview'],['power','Power'],['flight','Flight'],['hw','Hardware']].map(v=>`<button class="chip ${v[0]===view?'on':''}" data-view="${v[0]}">${v[1]}</button>`).join('');
+ const ds=sel.map(get),best=(f,lo)=>ds.reduce((a,b)=>(lo?f(b)<f(a):f(b)>f(a))?b:a);
+ $('#winners').innerHTML=[['Lightest',best(d=>d.weight,1),d=>fm(d.weight)+' g dry'],['Longest flight',best(calc.time),d=>fm(calc.time(d))+' min @ '+bat],['Fastest (est.)',best(calc.speed),d=>calc.speed(d)+' km/h'],['Most spare payload',best(calc.pay),d=>fm(calc.pay(d))+' g']].map(w=>`<div><span class="sub">${w[0]}</span><b>${w[1].name}</b><span class="sub">${w[2](w[1])}</span></div>`).join('');
+ const idx=(f,d,lo)=>{const v=ds.map(f),mn=Math.min(...v),mx=Math.max(...v);return mn===mx?100:Math.round(lo?(mx-f(d))/(mx-mn)*100:f(d)/mx*100)};
+ $('#cards').innerHTML=ds.map(d=>{const s=idx(x=>x.weight,d,1);let x='';
+  if(view==='summary')x=`<div class="r"><span>${T('Dry weight','Weight without battery. Good for comparing base mass, but not takeoff weight.')}</span><b>${fm(d.weight)} g</b></div><div class="r"><span>${T('Flight time','Published or estimated flight time, scaled linearly to the reference battery.')}</span><b>${fm(calc.time(d))} min</b></div><div class="r"><span>${T('Weight index','Relative to your selection: 100 is the lightest drone.')}</span><b style="color:var(--ok)">${s}/100</b></div><div class="bar"><i style="width:${s}%"></i></div>`;
+  if(view==='power')x=`<div class="r"><span>${T('Motor','Stator size: 0802 means roughly 8 mm wide and 2 mm tall. Size alone does not predict performance.')}</span><b>${d.motor}</b></div><div class="r"><span>${T('KV','Theoretical unloaded RPM per volt. Not directly speed.')}</span><b>${d.kv}</b></div><div class="r"><span>Propeller</span><b>${d.prop} mm</b></div><div class="r"><span>${T('Thrust/weight','Total estimated thrust divided by flying weight. Above ~5:1 feels lively; above ~8:1 is racing-grade.')}</span><b>${fm(calc.tw(d))}:1</b></div>`;
+  if(view==='flight')x=`<div class="r"><span>Flight time @ ${bat} mAh</span><b>${fm(calc.time(d))} min</b></div><div class="r"><span>Flying weight</span><b>${fm(calc.fly(d))} g</b></div><div class="r"><span>${T('Top speed','Empirical estimate from KV and mass. Props, voltage sag and wind change it a lot.')}</span><b>≈ ${calc.speed(d)} km/h</b></div><div class="r"><span>${T('Spare payload','Extra weight it could carry while keeping a 2:1 thrust-to-weight reserve.')}</span><b>≈ ${fm(calc.pay(d))} g</b></div>`;
+  if(view==='hw')x=`<div class="r"><span>Flight controller</span><b>${d.fc}</b></div><div class="r"><span>Video</span><b>${d.vtx}</b></div><div class="r"><span>Receiver</span><b>${d.rx}</b></div>`;
+  return `<article class="card"><div class="t"><div class="sub">${d.brand} · ${CATS[d.cat]}</div><h3>${d.name}</h3>${tag(d)}<div class="sub" style="margin-top:6px">${d.notes}</div></div><div class="b">${x}</div></article>`}).join('');
+ const rows=[['Dry weight','weight','g',1,'Drone mass without battery. Less weight usually means more agility.'],['Flying weight',calc.fly,'g',1,'Dry weight plus the reference battery.'],['Flight time',calc.time,'min',0,'Flight time scaled to the reference battery capacity.'],['Thrust-to-weight',calc.tw,':1',0,'Estimated total thrust over flying weight.'],['Top speed (est.)',calc.speed,'km/h',0,'Empirical class estimate.'],['Spare payload',calc.pay,'g',0,'Extra load with a 2:1 reserve.'],['Motor KV','kv','KV',0,'Theoretical RPM per volt.'],['Prop diameter','prop','mm',0,'Affects thrust, efficiency and fit.']];
+ $('#tbl').innerHTML='<thead><tr><th>Metric</th>'+ds.map(d=>`<th>${d.name}</th>`).join('')+'</tr></thead><tbody>'+rows.map(([l,k,u,lo,t])=>{const f=typeof k==='function'?k:d=>d[k],v=ds.map(f),b=lo?Math.min(...v):Math.max(...v);return `<tr><td>${T(l,t)}<div class="sub">${u}</div></td>`+v.map(x=>{const p=b===0?100:Math.round(lo?b/x*100:x/b*100);return `<td><div class="${x===b?'best':''}">${fm(x)} ${u}</div><div class="bar"><i style="width:${p}%;${x===b?'background:var(--ok)':'opacity:.55'}"></i></div><div class="sub">${p}% of best</div></td>`}).join('')+'</tr>'}).join('')+'</tbody>';
+ const qq=$('#q').value.trim().toLowerCase(),fl=db.filter(d=>(cat==='all'||d.cat===cat)&&(d.name+d.brand+CATS[d.cat]+d.vtx).toLowerCase().includes(qq));
+ $('#cc').textContent=fl.length+' of '+db.length+' models';
+ $('#cats').innerHTML=[['all','All']].concat(Object.entries(CATS)).map(c=>`<button class="chip ${c[0]===cat?'on':''}" data-cat="${c[0]}">${c[1]}</button>`).join('');
+ $('#catalog').innerHTML=fl.map(d=>`<div class="cat"><div><b>${d.name}</b> ${tag(d)}<div class="sub">${d.brand} · ${CATS[d.cat]} · ${fm(d.weight)} g dry</div></div><button class="btn" data-add="${d.id}" ${sel.includes(d.id)||sel.length>=5?'disabled':''}>${sel.includes(d.id)?'Added':'+ Add'}</button></div>`).join('')||'<div class="sub">No models match. Try a different search or category.</div>';
+}
+document.addEventListener('click',e=>{const c=e.target.closest.bind(e.target);let x;
+ if(x=c('[data-rm]'))sel=sel.filter(i=>i!==x.dataset.rm);else if(x=c('[data-bat]'))bat=+x.dataset.bat;else if(x=c('[data-view]'))view=x.dataset.view;else if(x=c('[data-cat]'))cat=x.dataset.cat;
+ else if(x=c('[data-add]')){if(sel.length<5)sel.push(x.dataset.add)}else if(c('#add')){const d=db.find(y=>!sel.includes(y.id));if(d&&sel.length<5)sel.push(d.id)}else return;render()});
+document.addEventListener('change',e=>{const s=e.target.closest('[data-sw]');if(!s)return;if(sel.includes(s.value)&&s.value!==s.dataset.sw){s.value=s.dataset.sw;return}sel=sel.map(i=>i===s.dataset.sw?s.value:i);render()});
+$('#q').addEventListener('input',render);
+// Builder
+const D={
+frame:{'65':['65 mm tinywhoop',2.8,35],'75':['75 mm whoop',4.2,40],'85':['85 mm whoop',5.8,45],'85x':['85 mm whoop, reinforced',6.5,45],open:['2" open prop',7.5,51],'3in':['3" open prop',12,76]},
+motor:{'0702':['0702 · 28000 KV',4.8,28000,18,2.1,31],'0802':['0802 · 22000 KV',5.6,22000,25,2.8,31],'0802hi':['0802 · 27000 KV',5.8,27000,28,3.4,31],'0803':['0803 · 19000 KV',7.2,19000,36,4,35],'1002':['1002 · 22000 KV',8.4,22000,39,4.5,35],'1102':['1102 · 18000 KV',10.4,18000,48,5,40],'1103':['1103 · 16000 KV',12,16000,62,6,45],'1202':['1202 · 10000 KV',14,10000,68,6.5,45]},
+stack:{aio5:['AIO 1S 5 A',2.8,5],aio12:['AIO 1S 12 A',3.5,12],aiohd:['AIO 1S HD',3.8,5],aio20:['AIO 2–4S 20 A',5.8,20],aio25:['AIO 2S 25 A',6.5,25],aio35:['AIO 2–4S 35 A',8.5,35]},
+props:{'31':['31 mm · 3-blade',.7,31,.78],'35':['35 mm · 3-blade',.9,35,1],'40':['40 mm · 3-blade',1.2,40,1.2],'40bi':['40 mm · bi-blade',.8,40,1.05],'45':['45 mm · 3-blade',1.6,45,1.42],'2in':['2" · 2-blade',2.2,51,1.55],'3in':['3" · 3-blade',4.5,76,1.9]},
+video:{none:['No camera / VTX',0],analog:['Light analog camera + VTX',1.8],runcam:['Micro analog camera + VTX',2.4],hdzero:['HDZero Whoop Lite',4.5],walksnail:['Walksnail Avatar 1S*',7.5],o4:['DJI O4 Air Unit*',8.2]},
+rx:{integrated:['Integrated / basic receiver',.4],external:['External receiver',.8],gps:['Receiver + light GPS',2.5]},
+battery:{300:['300 mAh',8.2],450:['450 mAh',11.5],550:['550 mAh',13.8],650:['650 mAh',16.2],750:['750 mAh',19],850:['850 mAh',22],1000:['1000 mAh',26]},
+tune:{efficiency:['Efficient / cruising'],balanced:['Balanced'],aggressive:['Freestyle / aggressive']}};
+const F=[['frame','Frame','Sets base mass and the largest propeller it can take.'],['motor','Motors (set of 4)','KV alone does not decide speed or thrust. Stator size and prop matter just as much.'],['stack','Flight controller + ESC','Check cell count, current rating and connectors on the real part.'],['props','Propellers','Diameter and pitch drive thrust, current draw and top speed.'],['video','Camera / video system','*Real weight depends on the unit, antenna and wiring included.'],['rx','Receiver / extras','Excludes screws, canopy, wiring and mods.'],['battery','1S battery','More capacity means more flight time, but also more weight.'],['tune','Flight style','Changes the assumed current draw used for flight time.']];
+const DEF={frame:'75',motor:'0802',stack:'aio5',props:'35',video:'analog',rx:'integrated',battery:'450',tune:'balanced'};
+const PRE={'Indoor 65':{frame:'65',motor:'0702',props:'31',battery:'300'},'Freestyle 75':{motor:'0802hi',stack:'aio12',props:'40',tune:'aggressive'},'Digital HD 75':{motor:'1002',stack:'aiohd',props:'40',video:'hdzero',rx:'external',battery:'550'},'3" cruiser':{frame:'3in',motor:'1103',stack:'aio12',props:'3in',video:'walksnail',rx:'gps',battery:'1000',tune:'efficiency'}};
+$('#bf').innerHTML=F.map(([k,l,t])=>`<div><label for="b_${k}">${T(l,t)}</label><select id="b_${k}">${Object.entries(D[k]).map(([v,a])=>`<option value="${v}">${a[0]}${a[1]!=null&&k!=='motor'||k==='motor'?` · ${a[1]} g`:''}</option>`).join('')}</select></div>`).join('');
+$('#presets').innerHTML=Object.keys(PRE).map(p=>`<button class="chip" data-pre="${p}">${p}</button>`).join('');
+const val=k=>$('#b_'+k).value,setB=o=>{Object.entries(Object.assign({},DEF,o)).forEach(([k,v])=>$('#b_'+k).value=v);calcB()};
+const COL=['#5cc8ff','#7be0a4','#ffb454','#c79bff','#ff7b9c','#8fa3bd','#f2e27a'];
+function calcB(){
+ const [,fw,fmax]=D.frame[val('frame')],[,mw,kv,mt,ma,pmin]=D.motor[val('motor')],[,sw,sl]=D.stack[val('stack')],[,pw,pd,pf]=D.props[val('props')],vw=D.video[val('video')][1],rw=D.rx[val('rx')][1],bwt=D.battery[val('battery')][1],mah=+val('battery'),tune=val('tune');
+ const big=pd>fmax,mis=pd<pmin,wire=2.2,wt=fw+mw+sw+pw+vw+rw+wire+bwt;
+ const mf={efficiency:.82,balanced:1,aggressive:1.12}[tune],cf={efficiency:.78,balanced:1,aggressive:1.18}[tune];
+ const raw=mt*pf*(3.7/3.8)*mf,cur=ma*Math.pow(pf,1.15)*cf,lim=Math.min(cur,sl/4),thr=raw*lim/Math.max(cur,.01),ratio=thr*4/wt;
+ const sz=pd<=35?.84:pd<=40?1:pd<=45?1.08:1.12;let sp=34*Math.sqrt(kv/22000)*sz*Math.sqrt(25/wt)*({efficiency:.88,balanced:1,aggressive:1.12}[tune]);if(big)sp*=.78;if(mis)sp*=.82;sp=Math.max(10,Math.min(85,sp));
+ const avg=(ma*4*.36+.45)*({efficiency:.75,balanced:1,aggressive:1.35}[tune]),fl=Math.max(1,Math.min(15,mah/1000*60/(avg*Math.max(.72,Math.min(1.3,Math.sqrt(wt/30)))*(vw>=7?1.14:vw>=4?1.07:1))));
+ const R=[['Total weight',wt.toFixed(1)+' g','Everything on the aircraft, including the battery.'],['Top speed','≈ '+Math.round(sp)+' km/h','Theoretical estimate. Real speed depends on props, pitch, firmware, wind and voltage sag.'],['Flight time','≈ '+fl.toFixed(1)+' min','Mixed flying. Depends on battery health and piloting style.'],['Total thrust','≈ '+Math.round(thr*4)+' gf','Approximated from motor and prop class, not from bench tests.'],['Thrust-to-weight',ratio.toFixed(2)+' : 1','Higher means more acceleration headroom. Around 5:1 is lively, 8:1+ is racing-grade.'],['Nominal energy',(mah*3.7/1000).toFixed(2)+' Wh','Capacity × 3.7 V.']];
+ $('#res').innerHTML=R.map(r=>`<div><span class="sub">${T(r[0],r[2])}</span><strong>${r[1]}</strong></div>`).join('');
+ const v=ratio<3?'Underpowered':ratio<5?'Cruising':ratio<8?'Freestyle-ready':'Racing-grade';$('#verdict').textContent=v;$('#verdict').className='tag'+(ratio<3?' e':'');
+ const P=[['Frame',fw],['Motors',mw],['FC / ESC',sw],['Props',pw],['Video',vw],['RX + wiring',rw+wire],['Battery',bwt]];
+ $('#stack').innerHTML=P.map((p,i)=>`<i style="width:${p[1]/wt*100}%;background:${COL[i]}" data-tip="${p[0]}: ${p[1].toFixed(1)} g (${Math.round(p[1]/wt*100)}%)"></i>`).join('');
+ $('#lg').innerHTML=P.map((p,i)=>`<span><i style="background:${COL[i]}"></i>${p[0]} ${p[1].toFixed(1)} g</span>`).join('');
+ let w=[];if(big)w.push('This prop may not fit the frame.');else if(mis)w.push('This motor and prop pairing may be a poor match.');if(sl/4<cur)w.push('The ESC may limit current with this combination.');if(ratio<3)w.push('Thrust-to-weight is low: expect sluggish response.');
+ const b=$('#bw');b.className='warn'+(w.length?'':' ok');b.textContent=w.length?'⚠ '+w.join(' '):'No obvious conflicts. Still check space, mounting, cell count and current rating on each real part.';
+ window.__sum='FPV LAB — BUILD SUMMARY\n'+F.map(f=>f[1]+': '+$('#b_'+f[0]).selectedOptions[0].text).join('\n')+'\n'+R.map(r=>r[0]+': '+r[1]).join('\n')+'\n\nRough estimates, not test results. Verify compatibility and datasheets.';
+}
+F.forEach(f=>$('#b_'+f[0]).addEventListener('change',calcB));
+document.addEventListener('click',e=>{const p=e.target.closest('[data-pre]');if(p)setB(PRE[p.dataset.pre])});
+$('#reset').addEventListener('click',()=>setB({}));
+$('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(window.__sum);$('#cs').textContent='Summary copied.'}catch(_){const a=document.createElement('textarea');a.value=window.__sum;document.body.appendChild(a);a.select();try{document.execCommand('copy');$('#cs').textContent='Summary copied.'}catch(__){$('#cs').textContent='Could not copy automatically.'}a.remove()}});
+// Glossary
+$('#gl').innerHTML=[['1S','One lithium cell in series: 3.7 V nominal, 4.2 V full. Standard for tinywhoops.'],['KV','Unloaded RPM per volt. High KV suits small props, low KV suits large props. It is not a speed rating.'],['Stator size (0802)','Motor diameter and height in mm: 0802 is about 8 × 2 mm. Bigger stators give more thrust and use more current.'],['Thrust-to-weight','Total thrust over weight. 3:1 is a floor for stable flight, 5:1 feels lively, 8:1+ is racing territory.'],['AIO','All-in-one board combining flight controller, ESC and often the receiver and VTX to save weight.'],['ELRS','ExpressLRS, an open radio link with long range and low latency, common in micro receivers.'],['Analog vs digital','Analog is light, cheap and low-latency. Digital (HDZero, Walksnail, DJI O4) gives HD picture but adds weight and cost.'],['Whoop vs open prop','Whoops have ducts around the props, so they are safer indoors. Open-prop quads are lighter and more efficient outdoors.'],['mAh and Wh','mAh is charge, Wh is energy (mAh × voltage). Wh lets you compare packs of different voltage fairly.'],['Voltage sag','Voltage drops under load, cutting thrust late in a pack. Fresh, high-C packs sag less.']].map(g=>`<div class="pn" style="background:var(--p2)"><h3>${g[0]}</h3><p>${g[1]}</p></div>`).join('');
+render();setB({});go(location.hash.slice(1));
+})();
+</script></body></html>
